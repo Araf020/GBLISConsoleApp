@@ -9,7 +9,7 @@ Interfaces:
         # In accordance with the ASTM/CLSI standards, it is transmitted in plaintext.
         Password:
         # Provide the name of the serial port connected to the instrument.
-        Portname:   COM2
+        Portname:   COM1
         # Acceptable baud rate values include 1200, 2400, 4800, or 9600 (default). Some systems may also support 19200 or 38400.
         Baud:   9600 
         # Acceptable parity values include None (default), Even, or Odd.

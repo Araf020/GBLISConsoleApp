@@ -30,9 +30,15 @@ namespace UniversaLIS
                get => portName;
           }
 
-          public event EventHandler? PortDataReceived;
+        public event EventHandler? PortDataReceived;
+        //public event EventHandler<DataReceivedEventArgs> PortDataReceived;
 
-          private readonly System.Timers.Timer portTimer = new System.Timers.Timer();
+        //protected virtual void OnPortDataReceived(DataReceivedEventArgs e)
+        //{
+        //    PortDataReceived?.Invoke(this, e);
+        //}
+
+        private readonly System.Timers.Timer portTimer = new System.Timers.Timer();
 
           /* This procedure may or may not evolve into something useful. */
           protected void CheckDataReceived()
@@ -47,6 +53,10 @@ namespace UniversaLIS
                          {
                               bytesReceived = client.Receive(readBuffer);
                               incomingData.Append(Encoding.UTF8.GetString(readBuffer, 0, bytesReceived));
+                             //output the data
+                             Console.WriteLine(incomingData.ToString());
+
+                           
 
                          }
                          catch (SocketException)
@@ -61,11 +71,13 @@ namespace UniversaLIS
                     }
                     if (incomingData.Length > 0)
                     {
-                         EventHandler? handler = this.PortDataReceived;
-                         EventArgs eventArgs = new EventArgs();
-                         handler?.Invoke(this, eventArgs);
-                    }
-               }
+                    //OnPortDataReceived(new DataReceivedEventArgs(incomingData.ToString()));
+
+                    EventHandler? handler = this.PortDataReceived;
+                    EventArgs eventArgs = new EventArgs();
+                    handler?.Invoke(this, eventArgs);
+                }
+            }
 
           }
           private void CheckDataReceived(Object source, System.Timers.ElapsedEventArgs e)
@@ -88,6 +100,11 @@ namespace UniversaLIS
           {
                server.Start(1); // Only one instrument connection per port, for simplicity.
                Console.WriteLine("Waiting for a connection...");
+               //console log the server ip address
+               // which port
+               Console.WriteLine($"Server IP Address: {((IPEndPoint)server.LocalEndpoint).Address}");
+               Console.WriteLine($"Server Port: {((IPEndPoint)server.LocalEndpoint).Port}");
+            //Console.WriteLine()
                client = server.AcceptSocket();
                AppendToLog("Connected!");
                incomingData.Clear();
@@ -135,4 +152,14 @@ namespace UniversaLIS
                }
           }
      }
+
+    public class DataReceivedEventArgs : EventArgs
+    {
+        public string ReceivedData { get; }
+
+        public DataReceivedEventArgs(string receivedData)
+        {
+            ReceivedData = receivedData;
+        }
+    }
 }

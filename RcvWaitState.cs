@@ -38,12 +38,14 @@ namespace UniversaLIS
           {
                // This shouldn't happen. Ignore it, I guess, and hope the instrument gets its act together.
                AppendToLog("ACK received in RcvWait state.");
+            Console.WriteLine("ACK received in RcvWait state.");
           }
 
           public void RcvData(string InputString)
           {
                // Compare the frame number and checksum to see whether the frame is good or bad.
                bool isFrameGood;
+              Console.WriteLine($"RcvData: {InputString}");
                // Compare frame numbers.
                if (InputString.TrimStart('\x02').StartsWith(ExpectedFrame.ToString()))
                {

@@ -118,10 +118,17 @@ namespace UniversaLIS
                {
                     // Set the port properties and try to open it.
                     receiver_id = tcpSettings.ReceiverId;
-                    ComPort = new TcpPort(tcpSettings);
-                    // Set the handler for the DataReceived event.
-                    ComPort.PortDataReceived += CommPortDataReceived!;
-                    CurrentMessage = new Message(this);
+                    TcpPort tcpPort = new TcpPort(tcpSettings);
+                    ComPort = tcpPort;
+                //tcpPort.PortDataReceived += (sender, e) =>
+                //{
+                //    // Access the received data through e.ReceivedData
+                //    string receivedData = e.ReceivedData;
+                //    Console.WriteLine($"Received data: {receivedData}");
+                //};
+                // Set the handler for the DataReceived event.
+                ComPort.PortDataReceived += CommPortDataReceived!;
+                CurrentMessage = new Message(this);
                     ComPort.Open();
                     AppendToLog($"Socket opened: {tcpSettings.Socket}");
                     idleTimer.AutoReset = true;
