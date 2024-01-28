@@ -202,7 +202,7 @@ namespace UniversaLIS
                      */
                     // Read one char at a time until the ReadChar times out.
                     try
-                    {
+                                      {
                          buffer.Append(port.ReadChars());
                     }
                     catch (Exception)
