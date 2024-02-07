@@ -65,7 +65,7 @@ ServiceConfig:
     # CURRENTLY UNSUPPORTED
     UseExternalDb:    true
     # The connection string used to connect to the database.
-    ConnectionString:  Data Source=127.0.0.1\SQLExpress;Initial Catalog=LISDB;Integrated Security=True
+    ConnectionString:  Data Source=HAROLD\MSSQLSERVER01;Initial Catalog=gbLIS;Integrated Security=True
     # The file path to the SQLite database file.
     # CURRENTLY UNSUPPORTED
     SqlitePath: 

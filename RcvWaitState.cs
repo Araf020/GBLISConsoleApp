@@ -121,8 +121,9 @@ namespace UniversaLIS
 
             if (position < 0)
                {
-                    // If no <ETX>, maybe it's an intermediate frame. Check for <ETB>.
-                    position = message.IndexOf(Constants.ETB);
+                // If no <ETX>, maybe it's an intermediate frame. Check for <ETB>.
+                //position = message.IndexOf(Constants.ETB);
+                position = message.IndexOf('\u0017');
                     if (position < 0)
                     {
                          return false;

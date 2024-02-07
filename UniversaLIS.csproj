@@ -106,4 +106,8 @@
   <ItemGroup>
     <Content Include="appsettings.json" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GB.Medical.Model\GB.Medical.Model.csproj" />
+    <ProjectReference Include="..\MessageParser\MessageParser.csproj" />
+  </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 using static UniversaLIS.UniversaLIService;
+using MessageParser.Services;
 // TODO: Escape special characters in message fields, remove any delimiter characters within field contents.
 // TODO: Consider field mappings when constructing SQL commands.
 namespace UniversaLIS
@@ -15,6 +16,7 @@ namespace UniversaLIS
           private readonly IPortAdapter ComPort;
           private readonly IPortSettings portSettings;
           internal UniversaLIService service;
+          internal Parser messageParser = new Parser();
           public CountdownTimer ContentTimer { get; set; } = new CountdownTimer(-1);
 
           public int CurrentFrameCounter { get; set; }
@@ -244,9 +246,11 @@ namespace UniversaLIS
                     UniversaLIService.AppendToLog($"Invalid message: {messageLine}");
                     return;
                }
-               int position = messageLine.IndexOf(Constants.ETB);
+               //int position = messageLine.IndexOf(Constants.ETB);
+               int position = messageLine.IndexOf('\u0017');
                if (position >= 0)
                {
+                // inter mediate frame
                     bInterFrame = true;
                     if (intermediateFrame?.Length > 2)
                     {
@@ -256,10 +260,12 @@ namespace UniversaLIS
                     {
                          intermediateFrame += messageLine.Substring(0, position);
                     }
+                    
                     return; // Don't process yet.
                }
                else
                {
+
                     if (bInterFrame) // If it's an intermediate frame, trim off the frame number and concatenate with previous frame.
                     {
                          intermediateFrame += messageLine.Substring(2, position);
@@ -268,42 +274,56 @@ namespace UniversaLIS
                          bInterFrame = false;
                     }
                }
-               switch (messageLine.Substring(2, 1))
+               if (messageLine.Length < 5)
                {
-                    case "H": // New message header.
-                         CurrentMessage = new Message(messageLine);
-                         break;
-
-                    case "P": // Patient record.
-                         CurrentMessage.Patients.Add(new Patient(messageLine));
-                         break;
-
-                    case "O": // Order record.
-                         CurrentMessage.Patients[^1].Orders.Add(new Order(messageLine));
-                         break;
-
-                    case "R": // Result record.
-                         CurrentMessage.Patients[^1].Orders[^1].Results.Add(new Result(messageLine));
-                         break;
-
-                    case "L": // Terminator record.
-                         if (messageLine.Substring(5, 1) == Constants.CR)
-                         {
-                              CurrentMessage.Terminator = 'N';
-                         }
-                         else
-                         {
-                              CurrentMessage.Terminator = messageLine[5];
-                         }
-                         break;
-
-                    case "Q": // Host Query record.
-                         CurrentMessage.Queries.Add(new Query(messageLine));
-                         break;
-
-                    default:
-                         break;
+                      UniversaLIService.AppendToLog($"Invalid message: {messageLine}");
+                      return;
                }
+               else
+                {
+                messageParser.ParseMessage(messageLine);
+                //Console.WriteLine($"Received data: {messageLine}");
+
+                }
+
+
+               //switch (messageLine.Substring(2, 1))
+               //{
+                    
+               //     case "H": // New message header.
+               //          CurrentMessage = new Message(messageLine);
+               //          break;
+
+               //     case "P": // Patient record.
+               //          CurrentMessage.Patients.Add(new Patient(messageLine));
+               //          break;
+
+               //     case "O": // Order record.
+               //          CurrentMessage.Patients[^1].Orders.Add(new Order(messageLine));
+               //          break;
+
+               //     case "R": // Result record.
+               //          CurrentMessage.Patients[^1].Orders[^1].Results.Add(new Result(messageLine));
+               //          break;
+
+               //     case "L": // Terminator record.
+               //          if (messageLine.Substring(5, 1) == Constants.CR)
+               //          {
+               //               CurrentMessage.Terminator = 'N';
+               //          }
+               //          else
+               //          {
+               //               CurrentMessage.Terminator = messageLine[5];
+               //          }
+               //          break;
+
+               //     case "Q": // Host Query record.
+               //          CurrentMessage.Queries.Add(new Query(messageLine));
+               //          break;
+
+               //     default:
+               //          break;
+               //}
           }
 
           public void ProcessMessage(Message message)
